@@ -1,10 +1,10 @@
-#ifndef _HASH_H
-#define _HASH_H
+#ifndef HASH_H
+#define HASH_H
 
 #include <optional>
-#include <vector>
 #include <string>
 #include <tuple>
+#include <vector>
 
 typedef unsigned int Hash;
 
@@ -74,7 +74,9 @@ class hashTable {
   Hash hash(std::string_view key);
 
   // Search for an item with the specified key.
-  // Return the position if found, -1 otherwise.
+  // Return a bool indicating whether the key was
+  // found to exist in the table already,
+  // and the hash (with linear probing if necessary)
   std::pair<bool, Hash> findPos(std::string_view key);
 
   // The rehash function; makes the hash table bigger.
@@ -86,4 +88,4 @@ class hashTable {
   static unsigned int getPrime(int size);
 };
 
-#endif //_HASH_H
+#endif // HASH_H
