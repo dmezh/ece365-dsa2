@@ -1,8 +1,12 @@
 #ifndef _HASH_H
 #define _HASH_H
 
+#include <optional>
 #include <vector>
 #include <string>
+#include <tuple>
+
+typedef unsigned int Hash;
 
 class hashTable {
 
@@ -19,28 +23,28 @@ class hashTable {
   // Returns 0 on success,
   // 1 if key already exists in hash table,
   // 2 if rehash fails.
-  int insert(const std::string &key, void *pv = nullptr);
+  int insert(std::string_view, void *pv = nullptr);
 
   // Check if the specified key is in the hash table.
   // If so, return true; otherwise, return false.
-  bool contains(const std::string &key);
+  bool contains(std::string_view key);
 
   // Get the pointer associated with the specified key.
   // If the key does not exist in the hash table, return nullptr.
   // If an optional pointer to a bool is provided,
   // set the bool to true if the key is in the hash table,
   // and set the bool to false otherwise.
-  void *getPointer(const std::string &key, bool *b = nullptr);
+  void *getPointer(std::string_view, bool *b = nullptr);
 
   // Set the pointer associated with the specified key.
   // Returns 0 on success,
   // 1 if the key does not exist in the hash table.
-  int setPointer(const std::string &key, void *pv);
+  int setPointer(std::string_view, void *pv);
 
   // Delete the item with the specified key.
   // Returns true on success,
   // false if the specified key is not in the hash table.
-  bool remove(const std::string &key);
+  bool remove(std::string_view);
 
  private:
 
@@ -61,17 +65,17 @@ class hashTable {
     hashItem() = default;
   };
 
-  int capacity; // The current capacity of the hash table.
-  int filled; // Number of occupied items in the table.
+  int capacity;   // The current capacity of the hash table.
+  int filled {0}; // Number of occupied items in the table.
 
   std::vector<hashItem> data; // The actual entries are here.
 
   // The hash function.
-  int hash(const std::string &key);
+  Hash hash(std::string_view key);
 
   // Search for an item with the specified key.
   // Return the position if found, -1 otherwise.
-  int findPos(const std::string &key);
+  std::pair<bool, Hash> findPos(std::string_view key);
 
   // The rehash function; makes the hash table bigger.
   // Returns true on success, false if memory allocation fails.
