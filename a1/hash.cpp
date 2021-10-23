@@ -17,9 +17,11 @@ int hashTable::insert(std::string_view key, void *pv) {
     if (exists)
         return 1;
 
-    hashItem *i = &this->data.at(hash);
+    hashItem *i = &this->data[hash];
     i->key = key;
     i->isOccupied = true;
+    i->isDeleted = false;
+    i->pv = pv;
 
     this->filled++;
 
@@ -36,7 +38,7 @@ bool hashTable::rehash() {
         this->capacity = newSize;
 
         for (auto item : oldData) {
-            if (item.isOccupied) {
+            if (item.isOccupied && !item.isDeleted) {
                 this->insert(item.key);
             }
         }
@@ -50,8 +52,8 @@ bool hashTable::rehash() {
 std::pair<bool, Hash> hashTable::findPos(std::string_view key) {
     Hash hash = this->hash(key);
 
-    while (this->data.at(hash).isOccupied) { // linear probing
-        if (this->data.at(hash).key == key)
+    while (this->data[hash].isOccupied && !this->data[hash].isDeleted) { // linear probing
+        if (this->data[hash].key == key)
             return {true, hash};
 
         if (++hash >= this->capacity) // wrap around
@@ -93,4 +95,37 @@ bool hashTable::contains(std::string_view key) {
     bool exists;
     std::tie(exists, std::ignore) = this->findPos(key);
     return exists;
+}
+
+bool hashTable::setPointer(std::string_view key, void *pv) {
+    bool exists;
+    Hash h;
+
+    std::tie(exists, h) = this->findPos(key);
+    if (!exists)
+        return false;
+
+    this->data[h].pv = pv;
+    return true;
+}
+
+std::pair<bool, void*> hashTable::getPointer(std::string_view key) {
+    bool exists;
+    Hash h;
+
+    std::tie(exists, h) = this->findPos(key);
+    if (!exists)
+        return {false, nullptr};
+
+    return {true, this->data[h].pv};
+}
+
+bool hashTable::remove(std::string_view key) {
+    bool exists; Hash h;
+    std::tie(exists, h) = findPos(key);
+    if (!exists) return false;
+
+    data[h].isDeleted = true;
+    filled--;
+    return true;
 }

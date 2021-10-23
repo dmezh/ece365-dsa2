@@ -34,12 +34,12 @@ class hashTable {
   // If an optional pointer to a bool is provided,
   // set the bool to true if the key is in the hash table,
   // and set the bool to false otherwise.
-  void *getPointer(std::string_view, bool *b = nullptr);
+  std::pair<bool, void*> getPointer(std::string_view key);
 
   // Set the pointer associated with the specified key.
   // Returns 0 on success,
   // 1 if the key does not exist in the hash table.
-  int setPointer(std::string_view, void *pv);
+  bool setPointer(std::string_view key, void *pv);
 
   // Delete the item with the specified key.
   // Returns true on success,

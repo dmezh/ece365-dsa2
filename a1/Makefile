@@ -1,4 +1,4 @@
-CXXFLAGS = -O3 --std=c++17
+CXXFLAGS = -O3 --std=c++17 -pg
 
 spell: spellcheck.o hash.o util.o
 	g++ $(CXXFLAGS) -o spell spellcheck.o hash.o util.o
