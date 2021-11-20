@@ -11,17 +11,8 @@ set(CMAKE_EXE_LINKER_FLAGS "-fsanitize=undefined")
 
 include_directories(.)
 
-add_library(useHeap_carl
-	OBJECT
-		useHeap.cpp
-		hash.h
-		heap.h
-)
-
-add_executable(useHeap
+add_executable(graph_driver
+	graph_driver.cpp
 	hash.cpp
 	heap.cpp
-
 )
-
-target_link_libraries(useHeap useHeap_carl)
