@@ -8,7 +8,7 @@ heap::heap(int capacity) : mapping(capacity*2) {
 }
 
 int heap::insert(std::string_view id, int key, void *pv) {
-    if (currentSize+1 > data.capacity()) return 1;
+    if (currentSize+1 >= data.capacity()) return 1;
     if (mapping.contains(id)) return 2;
     
     Node n;
@@ -64,7 +64,7 @@ void heap::percolateDown(int hole) {
 
     Node tmp = data[hole];
 
-    for (; hole * 2 < currentSize; hole = child) {
+    for (; hole * 2 <= currentSize; hole = child) {
         child = hole * 2;
         if (child != currentSize && data[child+1].key < data[child].key) {
             child++;
