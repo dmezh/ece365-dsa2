@@ -47,7 +47,7 @@ int heap::setKey(std::string_view id, int key) {
     return 0;
 }
 
-void heap::percolateUp(int hole) {
+void heap::percolateUp(unsigned hole) {
     data[0] = data[hole];
 
     for (; data[0].key < data[hole / 2].key; hole /= 2) {
@@ -59,8 +59,8 @@ void heap::percolateUp(int hole) {
     mapping.setPointer(data[hole].id, &data[hole]);
 }
 
-void heap::percolateDown(int hole) {
-    int child;
+void heap::percolateDown(unsigned hole) {
+    unsigned child;
 
     Node tmp = data[hole];
 
@@ -120,7 +120,7 @@ int heap::getPos(const heap::Node *pn) {
 }
 
 void heap::dumptable() {
-    for (int i = 1; i < currentSize + 1; i++) {
+    for (unsigned i = 1; i < currentSize + 1; i++) {
         Node *n = &data[i];
         std::cout << "ID: \"" << n->id << "\" Key: " << n->key << std::endl;
     }

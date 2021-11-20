@@ -78,7 +78,7 @@ class heap {
         hashTable mapping;
         unsigned currentSize;
 
-        void percolateUp(int posCur);
-        void percolateDown(int posCur);
+        void percolateUp(unsigned posCur);
+        void percolateDown(unsigned posCur);
         int getPos(const Node *pn);
 };
