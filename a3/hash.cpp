@@ -63,7 +63,7 @@ std::pair<bool, Hash> hashTable::findPos(std::string_view key) {
     return {false, hash};
 }
 
-hashTable::hashTable(int size) {
+hashTable::hashTable(unsigned size) {
     this->capacity = getPrime(size);
     this->data.resize(this->capacity);
 }

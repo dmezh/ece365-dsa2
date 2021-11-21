@@ -15,7 +15,7 @@ class hashTable {
   // The constructor initializes the hash table.
   // Uses getPrime to choose a prime number at least as large as
   // the specified size for the initial size of the hash table.
-  hashTable(int size = 0);
+  hashTable(unsigned size = 100);
 
   // Insert the specified key into the hash table.
   // If an optional pointer is provided,

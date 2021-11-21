@@ -9,7 +9,7 @@ class heap {
         // heap - The constructor allocates space for the nodes of the heap
         // and the mapping (hash table) based on the specified capacity
         //
-        heap(int capacity);
+        heap(int capacity = 100);
 
         //
         // insert - Inserts a new node into the binary heap
