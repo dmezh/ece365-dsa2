@@ -3,7 +3,7 @@
 #include <iostream>
 
 heap::heap(int capacity) : mapping(capacity*2) {
-    data.reserve(capacity + 1);
+    data.resize(capacity + 1);
     currentSize = 0;
 }
 

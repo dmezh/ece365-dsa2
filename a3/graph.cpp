@@ -1,10 +1,11 @@
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 #include "graph.h"
 
 void Graph::print_rev(Vertex* v) {
-    if (!v) return;
+    if (!v)
+        return;
 
     print_rev(v->prev);
 
@@ -12,7 +13,7 @@ void Graph::print_rev(Vertex* v) {
 }
 
 void Graph::dump_distances() {
-    for (auto const& v : vertices_in_order) {
+    for (auto const *v : vertices_in_order) {
         std::cout << v->id << ": ";
 
         if (v->distance == -1) {   
@@ -32,7 +33,7 @@ void Graph::dump_distances() {
 
 void Graph::run_dijkstra(std::string_view start) {
     // yeah buddy
-    Vertex * cur = get_vertex_from_lookup(start);
+    auto cur = get_vertex_from_lookup(start);
 
     assert(!vertices_by_distance.insert(cur->id, 0, cur));
     cur->distance = 0;
@@ -87,8 +88,8 @@ void Graph::dump_vertices_from_order() {
 
 void Graph::insert_edge(std::string_view src_id, std::string_view dst_id, Distance d) {
     // first, let's check if we already have these vertices.
-    Vertex *src = get_vertex_from_lookup(src_id);
-    Vertex *dst = get_vertex_from_lookup(dst_id);
+    auto src = get_vertex_from_lookup(src_id);
+    auto dst = get_vertex_from_lookup(dst_id);
 
     if (!src) {
         src = add_vertex(src_id);
@@ -99,7 +100,7 @@ void Graph::insert_edge(std::string_view src_id, std::string_view dst_id, Distan
     }
 
     auto e = Vertex::Edge(dst, d);
-    src->edges.push_back(std::move(e));
+    src->edges.push_back(e);
 
     // hash table will auto-resize as needed. HEAP WILL NOT!
 }
@@ -112,13 +113,13 @@ Graph::Vertex* Graph::get_vertex_from_lookup(std::string_view id) {
 
     if (exists)
         return static_cast<Vertex*>(v);
-    else
-        return nullptr;   
+
+    return nullptr;
 }
 
 Graph::Vertex* Graph::add_vertex(std::string_view id) {
-    Vertex *n = new Vertex(id);
-    assert(!vertices_lookup.insert(id, n));
+    auto *n = new Vertex(id);
+    assert(!vertices_lookup.insert(id, static_cast<void*>(n)));
 
     vertices_in_order.push_back(n);
 
@@ -126,7 +127,7 @@ Graph::Vertex* Graph::add_vertex(std::string_view id) {
 }
 
 Graph::~Graph() {
-    for (auto v : vertices_in_order) {
+    for (auto *v : vertices_in_order) {
         delete v;
     }
 }
