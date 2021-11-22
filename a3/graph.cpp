@@ -2,8 +2,10 @@
 #include <iostream>
 
 #include "graph.h"
+#include "heap.h"
 
-void Graph::print_rev(Vertex* v) {
+void Graph::print_rev(const Vertex* v)
+{
     if (!v)
         return;
 
@@ -12,8 +14,9 @@ void Graph::print_rev(Vertex* v) {
     std::cout << v->id << ", ";
 }
 
-void Graph::dump_distances() {
-    for (auto const *v : vertices_in_order) {
+void Graph::dump_distances()
+{
+    for (auto&& v : vertices_in_order) {
         std::cout << v->id << ": ";
 
         if (v->distance == -1) {   
@@ -31,16 +34,24 @@ void Graph::dump_distances() {
     }
 }
 
-void Graph::run_dijkstra(std::string_view start) {
-    // yeah buddy
-    auto cur = get_vertex_from_lookup(start);
+void Graph::run_dijkstra(std::string_view start)
+{
+    heap vertices_by_distance = heap(vertices_in_order.size() * 2);
 
-    assert(!vertices_by_distance.insert(cur->id, 0, cur));
+    auto cur = get_vertex_from_lookup(start);
+    if (!cur) {
+        std::cerr << "Error: start vertex " << start << " does not exist!\n";
+        exit(-1);
+    }
+
     cur->distance = 0;
     cur->prev = nullptr;
 
+    vertices_by_distance.insert(cur->id, 0, cur);
+
     while (!vertices_by_distance.deleteMin(nullptr, nullptr, &cur)) {
         if (cur->visited) continue;
+
         std::cerr << "Visiting vertex: " << cur->id << "\n";
         for (auto const & e : cur->edges) {
             std::cerr << "visiting edge:";
@@ -51,7 +62,6 @@ void Graph::run_dijkstra(std::string_view start) {
                     std::cerr << "Vertex inserted! ID: " << e.v->id << "\n";
                     break;
                 case 1:
-                    // HEAP RESIZE NEEDED
                     abort();
                 case 2:
                     std::cerr << "Vertex " << e.v->id << " found, not inserting\n";
@@ -72,12 +82,14 @@ void Graph::run_dijkstra(std::string_view start) {
     }
 }
 
-void Graph::Vertex::Edge::print_edge() const {
+void Graph::Vertex::Edge::print_edge() const
+{
     std::cerr << "\t[" << v->id << ", " << d << "]\n";
 }
 
-void Graph::dump_vertices_from_order() {
-    for (auto const & v : vertices_in_order) {
+void Graph::dump_vertices_from_order()
+{
+    for (auto&& v : vertices_in_order) {
         std::cerr << "ID: " << v->id << "\n";
         std::cerr << "\tEdges:\n";
         for (auto const & e : v->edges) {
@@ -86,26 +98,28 @@ void Graph::dump_vertices_from_order() {
     }
 }
 
-void Graph::insert_edge(std::string_view src_id, std::string_view dst_id, Distance d) {
+void Graph::insert_edge(std::string_view src_id, std::string_view dst_id, Distance d)
+{
     // first, let's check if we already have these vertices.
     auto src = get_vertex_from_lookup(src_id);
     auto dst = get_vertex_from_lookup(dst_id);
 
     if (!src) {
+        std::cerr << "Vertex " << src_id << " not found, adding." << std::endl;
         src = add_vertex(src_id);
     }
 
     if (!dst) {
+        std::cerr << "Vertex " << dst_id << " not found, adding." << std::endl;
         dst = add_vertex(dst_id);
     }
 
-    auto e = Vertex::Edge(dst, d);
+    Vertex::Edge e(dst, d);
     src->edges.push_back(e);
-
-    // hash table will auto-resize as needed. HEAP WILL NOT!
 }
 
-Graph::Vertex* Graph::get_vertex_from_lookup(std::string_view id) {
+Graph::Vertex* Graph::get_vertex_from_lookup(std::string_view id)
+{
     bool exists;
     void *v;
 
@@ -117,17 +131,18 @@ Graph::Vertex* Graph::get_vertex_from_lookup(std::string_view id) {
     return nullptr;
 }
 
-Graph::Vertex* Graph::add_vertex(std::string_view id) {
+Graph::Vertex* Graph::add_vertex(std::string_view id)
+{
     auto *n = new Vertex(id);
-    assert(!vertices_lookup.insert(id, static_cast<void*>(n)));
-
-    vertices_in_order.push_back(n);
-
-    return n;
-}
-
-Graph::~Graph() {
-    for (auto *v : vertices_in_order) {
-        delete v;
+    
+    int r = vertices_lookup.insert(id, static_cast<void*>(n));
+    if (r) {
+        std::cerr << "Vertex " << id << ": " << r << std::endl;
+        assert(0);
     }
+
+    vertices_in_order.emplace_back(n);
+
+    std::cerr << "Inserted vertex: " << id << std::endl;
+    return n;
 }

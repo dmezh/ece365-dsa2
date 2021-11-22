@@ -29,6 +29,7 @@ int hashTable::insert(std::string_view key, void *pv) {
 }
 
 bool hashTable::rehash() {
+    std::cerr << "Rehashing!!!" << std::endl;
     Hash newSize = getPrime(this->capacity * 2);
 
     try {
@@ -58,6 +59,8 @@ std::pair<bool, Hash> hashTable::findPos(std::string_view key) {
 
         if (++hash >= this->capacity) // wrap around
             hash = 0;
+
+        std::cerr << "linprobe\n";
     }
 
     return {false, hash};

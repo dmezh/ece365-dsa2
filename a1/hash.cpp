@@ -27,6 +27,7 @@ int hashTable::insert(std::string_view key, void *pv) {
 }
 
 bool hashTable::rehash() {
+    std::cerr << "REHASHING!!!" << std::endl;
     Hash newSize = getPrime(this->capacity * 2);
 
     try {
