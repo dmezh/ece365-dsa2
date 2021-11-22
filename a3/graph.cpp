@@ -38,6 +38,8 @@ bool Graph::run_dijkstra(std::string_view start)
 {
     heap vertices_by_distance = heap(vertices_in_order.size() * 2);
 
+    // Add start vertex to heap
+
     auto cur = get_vertex_from_lookup(start);
     if (!cur)
         return false;
@@ -47,46 +49,30 @@ bool Graph::run_dijkstra(std::string_view start)
 
     vertices_by_distance.insert(cur->id, 0, cur);
 
+    // Run Dijkstra's using heap::deleteMin()
+
     while (!vertices_by_distance.deleteMin(nullptr, nullptr, &cur)) {
+
         if (cur->visited) continue;
 
         for (auto const & e : cur->edges) {
-            switch (vertices_by_distance.insert(e.v->id, e.d, e.v)) {
-                case 0:
-                    break;
-                case 1:
-                    abort();
-                case 2:
-                    break;
-            }
+            // attempt to insert; no harm if it's already there
+            vertices_by_distance.insert(e.v->id, e.d, e.v);
 
-            Distance new_dist = cur->distance + e.d; // distance of neighbor from start
+            // distance of neighbor from start
+            Distance new_dist = cur->distance + e.d;
 
-            if (!e.v->distance_valid() || new_dist < e.v->distance) { // update distance
+            if (!e.v->distance_valid() || new_dist < e.v->distance) {
                 e.v->distance = new_dist;
                 e.v->prev = cur;
                 vertices_by_distance.setKey(e.v->id, new_dist);
             }
         }
-
         cur->visited = true;
+
     }
 
     return true;
-}
-
-void Graph::Vertex::Edge::print_edge() const
-{
-    // std::cerr << "\t[" << v->id << ", " << d << "]\n";
-}
-
-void Graph::dump_vertices_from_order()
-{
-    for (auto&& v : vertices_in_order) {
-        for (auto const & e : v->edges) {
-           e.print_edge();          
-        }
-    }
 }
 
 void Graph::insert_edge(std::string_view src_id, std::string_view dst_id, Distance d)
