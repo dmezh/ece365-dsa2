@@ -1,0 +1,4 @@
+CXXFLAGS = -O3 --std=c++17 -Wall -Werror -Wextra
+
+graph_driver: graph.cpp graph_driver.cpp util.cpp heap.cpp hash.cpp
+	g++ $(CXXFLAGS) -o graph_driver graph.cpp graph_driver.cpp util.cpp heap.cpp hash.cpp
