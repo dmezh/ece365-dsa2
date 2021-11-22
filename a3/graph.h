@@ -11,11 +11,35 @@ class Graph {
     public:
         typedef int Distance;
 
-        void insert_edge(std::string_view n1, std::string_view n2, Distance d);
-        void dump_vertices_from_order();
+        /*
+         * Insert the given edge (specified by the source and destination vertex ID and distance)
+         * into the graph.
+         *
+         * The vertices will be created and added to the graph if necessary.
+         */
+        void insert_edge(std::string_view src_id, std::string_view dst_id, Distance d);
 
+        /*
+         * Run Dijkstra's algorithm on the graph, starting from the given vertex ID.
+         *
+         * returns true if run was completed
+         * returns false if given start vertex ID was not in the graph.
+         */
         bool run_dijkstra(std::string_view start);
 
+        /*
+         * Dump the paths and distances for the vertices in the graph, in the order they were
+         * originally encountered.
+         *
+         * Format for each vertex, one per line:
+         *
+         * (vertex ID): (path length) [(start vertex ID), (next vertex ID), ... (vertex ID)]
+         *
+         * Example:
+         *
+         * v1: 0 [v1]
+         * v2: 2 [v1, v2]
+         */
         void dump_distances(std::ostream& out);
 
     private:
@@ -27,8 +51,6 @@ class Graph {
                         Distance d;
 
                         Edge(Graph::Vertex *v, Distance d) : v(v), d(d){};
-
-                        void print_edge() const;
                 };
 
                 std::list<Edge> edges;
@@ -36,9 +58,11 @@ class Graph {
 
                 Distance distance = -1;
                 Vertex *prev = nullptr;
+
                 bool visited = false;
 
                 Vertex(std::string_view id) : id(id){};
+
                 bool distance_valid() { return (distance != -1); }
         };
 

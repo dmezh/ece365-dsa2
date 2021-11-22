@@ -3,7 +3,7 @@
 #include "graph.h"
 #include "heap.h"
 
-void Graph::print_rev(const Vertex* v, std::ostream& out)
+void Graph::print_rev(const Vertex *v, std::ostream& out)
 {
     if (!v)
         return;
