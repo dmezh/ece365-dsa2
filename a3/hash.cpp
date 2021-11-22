@@ -42,7 +42,7 @@ bool hashTable::rehash() {
                 this->insert(item.key, item.pv);
             }
         }
-    } catch (std::bad_alloc) {
+    } catch (std::bad_alloc const&) {
         return false;
     }
 
