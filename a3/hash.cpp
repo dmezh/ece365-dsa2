@@ -29,7 +29,6 @@ int hashTable::insert(std::string_view key, void *pv) {
 }
 
 bool hashTable::rehash() {
-    std::cerr << "Rehashing!!!" << std::endl;
     Hash newSize = getPrime(this->capacity * 2);
 
     try {
@@ -40,7 +39,7 @@ bool hashTable::rehash() {
 
         for (auto item : oldData) {
             if (item.isOccupied && !item.isDeleted) {
-                this->insert(item.key);
+                this->insert(item.key, item.pv);
             }
         }
     } catch (std::bad_alloc) {
@@ -59,8 +58,6 @@ std::pair<bool, Hash> hashTable::findPos(std::string_view key) {
 
         if (++hash >= this->capacity) // wrap around
             hash = 0;
-
-        std::cerr << "linprobe\n";
     }
 
     return {false, hash};
@@ -73,7 +70,7 @@ hashTable::hashTable(unsigned size) {
 
 unsigned hashTable::getPrime(int size) {
     static const int primes[] = {
-        2,11,19,31,53,71,109,163,233,547,877,1229,1993,4001,7001,
+        7,11,19,31,53,71,109,163,233,547,877,1229,1993,4001,7001,
         10181,17393,26407,38923,52363,66107,84673,99551,121441,200033,
         300497,526441,1050139,2711899,5630279,8994599,12353267,15485863
     };

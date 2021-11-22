@@ -1,48 +1,46 @@
-#include <cassert>
-#include <iostream>
+#include <ostream>
 
 #include "graph.h"
 #include "heap.h"
 
-void Graph::print_rev(const Vertex* v)
+void Graph::print_rev(const Vertex* v, std::ostream& out)
 {
     if (!v)
         return;
 
-    print_rev(v->prev);
+    print_rev(v->prev, out);
 
-    std::cout << v->id << ", ";
+    out << v->id << ", ";
 }
 
-void Graph::dump_distances()
+void Graph::dump_distances(std::ostream& out)
 {
     for (auto&& v : vertices_in_order) {
-        std::cout << v->id << ": ";
+        out << v->id << ": ";
 
-        if (v->distance == -1) {   
-            std::cout << "NO PATH\n";
+        if (!v->distance_valid()) {
+            out << "NO PATH\n";
             continue;
         }
 
-        std::cout << v->distance;
+        out << v->distance;
 
-        std::cout << " [";
-        print_rev(v->prev);
-        std::cout << v->id << "]";
+        out << " [";
+        print_rev(v->prev, out);
+        out << v->id << "]";
 
-        std::cout << "\n";
+        out << "\n";
     }
 }
 
-void Graph::run_dijkstra(std::string_view start)
+// true if run finished, false if start vertex does not exist
+bool Graph::run_dijkstra(std::string_view start)
 {
     heap vertices_by_distance = heap(vertices_in_order.size() * 2);
 
     auto cur = get_vertex_from_lookup(start);
-    if (!cur) {
-        std::cerr << "Error: start vertex " << start << " does not exist!\n";
-        exit(-1);
-    }
+    if (!cur)
+        return false;
 
     cur->distance = 0;
     cur->prev = nullptr;
@@ -52,46 +50,39 @@ void Graph::run_dijkstra(std::string_view start)
     while (!vertices_by_distance.deleteMin(nullptr, nullptr, &cur)) {
         if (cur->visited) continue;
 
-        std::cerr << "Visiting vertex: " << cur->id << "\n";
         for (auto const & e : cur->edges) {
-            std::cerr << "visiting edge:";
-            e.print_edge();
-
             switch (vertices_by_distance.insert(e.v->id, e.d, e.v)) {
                 case 0:
-                    std::cerr << "Vertex inserted! ID: " << e.v->id << "\n";
                     break;
                 case 1:
                     abort();
                 case 2:
-                    std::cerr << "Vertex " << e.v->id << " found, not inserting\n";
                     break;
             }
 
             Distance new_dist = cur->distance + e.d; // distance of neighbor from start
-            if (e.v->distance == -1 || new_dist < e.v->distance) {
-                std::cerr << "Updating new shortest distance for [" << e.v->id << "]: " << new_dist << "\n";
+
+            if (!e.v->distance_valid() || new_dist < e.v->distance) { // update distance
                 e.v->distance = new_dist;
                 e.v->prev = cur;
                 vertices_by_distance.setKey(e.v->id, new_dist);
-            } else {
-                std::cerr << "Not updating new shortest distance, old=" << e.v->distance << ", new=" << new_dist << "\n";
             }
         }
-    cur->visited = true;
+
+        cur->visited = true;
     }
+
+    return true;
 }
 
 void Graph::Vertex::Edge::print_edge() const
 {
-    std::cerr << "\t[" << v->id << ", " << d << "]\n";
+    // std::cerr << "\t[" << v->id << ", " << d << "]\n";
 }
 
 void Graph::dump_vertices_from_order()
 {
     for (auto&& v : vertices_in_order) {
-        std::cerr << "ID: " << v->id << "\n";
-        std::cerr << "\tEdges:\n";
         for (auto const & e : v->edges) {
            e.print_edge();          
         }
@@ -104,18 +95,13 @@ void Graph::insert_edge(std::string_view src_id, std::string_view dst_id, Distan
     auto src = get_vertex_from_lookup(src_id);
     auto dst = get_vertex_from_lookup(dst_id);
 
-    if (!src) {
-        std::cerr << "Vertex " << src_id << " not found, adding." << std::endl;
+    if (!src)
         src = add_vertex(src_id);
-    }
 
-    if (!dst) {
-        std::cerr << "Vertex " << dst_id << " not found, adding." << std::endl;
+    if (!dst)
         dst = add_vertex(dst_id);
-    }
 
-    Vertex::Edge e(dst, d);
-    src->edges.push_back(e);
+    src->edges.emplace_back(dst, d);
 }
 
 Graph::Vertex* Graph::get_vertex_from_lookup(std::string_view id)
@@ -135,14 +121,10 @@ Graph::Vertex* Graph::add_vertex(std::string_view id)
 {
     auto *n = new Vertex(id);
     
-    int r = vertices_lookup.insert(id, static_cast<void*>(n));
-    if (r) {
-        std::cerr << "Vertex " << id << ": " << r << std::endl;
-        assert(0);
-    }
+    // vertices_lookup takes ownership
+    vertices_lookup.insert(id, static_cast<void*>(n));
 
     vertices_in_order.emplace_back(n);
 
-    std::cerr << "Inserted vertex: " << id << std::endl;
     return n;
 }
