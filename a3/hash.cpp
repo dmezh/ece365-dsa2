@@ -52,8 +52,8 @@ bool hashTable::rehash() {
 std::pair<bool, Hash> hashTable::findPos(std::string_view key) {
     Hash hash = this->hash(key);
 
-    while (this->data[hash].isOccupied && !this->data[hash].isDeleted) { // linear probing
-        if (this->data[hash].key == key)
+    while (this->data[hash].isOccupied) { // linear probing
+        if (this->data[hash].key == key && !this->data[hash].isDeleted)
             return {true, hash};
 
         if (++hash >= this->capacity) // wrap around
@@ -72,7 +72,9 @@ unsigned hashTable::getPrime(int size) {
     static const int primes[] = {
         7,11,19,31,53,71,109,163,233,547,877,1229,1993,4001,7001,
         10181,17393,26407,38923,52363,66107,84673,99551,121441,200033,
-        300497,526441,1050139,2711899,5630279,8994599,12353267,15485863
+        300497,526441,1050139,2711899,5630279,8994599,12353267,15485863,
+        32452867, 49979693, 67867979
+
     };
 
     for (auto prime : primes)
