@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-heap::heap(int capacity) : mapping(capacity*2) {
+heap::heap(int capacity) : mapping(capacity*8) {
     data.resize(capacity + 1);
     currentSize = 0;
 }

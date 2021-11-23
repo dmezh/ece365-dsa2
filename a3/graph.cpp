@@ -36,7 +36,7 @@ void Graph::dump_distances(std::ostream& out)
 // true if run finished, false if start vertex does not exist
 bool Graph::run_dijkstra(std::string_view start)
 {
-    heap vertices_by_distance = heap(vertices_in_order.size() * 2);
+    heap vertices_by_distance = heap(vertices_in_order.size() + 2);
 
     // Add start vertex to heap
 
