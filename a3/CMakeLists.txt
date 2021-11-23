@@ -4,8 +4,8 @@ project(ece365_program_2)
 
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_STANDARD 17)
-add_compile_options(-Wall -Wextra -Wpedantic -Wunused -O3)
-set(CMAKE_EXE_LINKER_FLAGS "-O3")
+add_compile_options(-Wall -Wextra -Wpedantic -Wunused -O3 -flto)
+set(CMAKE_EXE_LINKER_FLAGS "-O3 -flto")
 
 #set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*")
 
