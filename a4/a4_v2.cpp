@@ -22,7 +22,7 @@ int main() {
 
         bool m = solve(wA.c_str(), wB.c_str(), target.c_str(), 0, 0);
         
-        //print_map(target.c_str());
+//        print_map(target.c_str());
 
         if (m)
             output << get_solution(wA.c_str(), wB.c_str(), target.c_str()) << "\n";
@@ -36,7 +36,6 @@ int main() {
 char map[3002][3002] = {0};
 
 void reset_solver() {
-    std::cout << "clearing: " << sizeof(map) << "\n";
     memset(map, 0, sizeof(map));
 }
 
@@ -89,16 +88,17 @@ std::string get_solution(const char *wA, const char *wB, const char *target) {
 //   3. Match no words: mark as no solution
 
 bool solve(const char *wA, const char *wB, const char *target, unsigned x, unsigned y) {
-    if (!*target)
+    if (!*target) {
         return true;
+    }
 
     bool match_A = *wA && *wA == *target;
     bool match_B = *wB && *wB == *target;
 
     if (map[x][y]) {
-        if (map[x][y] == 'a' || map[x][y] == 'b' || map[x][y] == 'A' || map[x][y] == 'B')
-            return true;
-        return false;
+        if (map[x][y] == 'X' || map[x][y] == 'x')
+            return false;
+        return true;
     }
 
     if (match_A && match_B) {
@@ -121,8 +121,7 @@ bool solve(const char *wA, const char *wB, const char *target, unsigned x, unsig
         }
     } else if (match_A) {
         map[x][y] = 'A';
-        bool r = solve(wA+1, wB, target+1, x+1, y+1);
-        return r;
+        return solve(++wA, wB, ++target, ++x, ++y);
     } else if (match_B) {
         map[x][y] = 'B';
         return solve(wA, ++wB, ++target, ++x, ++y);
