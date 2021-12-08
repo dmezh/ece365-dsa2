@@ -22,7 +22,7 @@ int main() {
 
         bool m = solve(wA.c_str(), wB.c_str(), target.c_str(), 0, 0);
         
-//        print_map(target.c_str());
+        print_map(target.c_str());
 
         if (m)
             output << get_solution(wA.c_str(), wB.c_str(), target.c_str()) << "\n";
@@ -70,8 +70,8 @@ std::string get_solution(const char *wA, const char *wB, const char *target) {
             default:
                 std::cerr << "Encountered unexpected char " << map[x][y] << " during solution search at " << x << ", " << y << "\n";
                 std::cerr << "Surrounding: left: " << map[x-1][y] << ", right: " << map[x+1][y] << ", above: " << map[x][y-1] << ", below: " << map[x][y+1] << ", diagleft: " << map[x-1][y-1] << "\n";
-                return "*** NOT A MERGE ***";
-//              abort();
+                //return "*** NOT A MERGE ***";
+                abort();
         }
     }
 
@@ -88,18 +88,22 @@ std::string get_solution(const char *wA, const char *wB, const char *target) {
 //   3. Match no words: mark as no solution
 
 bool solve(const char *wA, const char *wB, const char *target, unsigned x, unsigned y) {
-    if (!*target) {
+    if (!*target && !*wA && !*wB)
+        return true;
+
+    if (!*target || (!*wA && !*wB))
+        return false;
+
+    if (map[x][y]) {
+        if (map[x][y] == 'X' || map[x][y] == 'x' || map[x][y] == '$')
+            return false;
+        if (map[x][y] == 'i')
+            abort();
         return true;
     }
 
     bool match_A = *wA && *wA == *target;
     bool match_B = *wB && *wB == *target;
-
-    if (map[x][y]) {
-        if (map[x][y] == 'X' || map[x][y] == 'x')
-            return false;
-        return true;
-    }
 
     if (match_A && match_B) {
         map[x][y] = 'i';
@@ -121,10 +125,20 @@ bool solve(const char *wA, const char *wB, const char *target, unsigned x, unsig
         }
     } else if (match_A) {
         map[x][y] = 'A';
-        return solve(++wA, wB, ++target, ++x, ++y);
+        bool s = solve(wA+1, wB, target+1, x+1, y+1);
+
+        if (s) return true;
+
+        map[x][y] = '$'; // poison this cell
+        return false;
     } else if (match_B) {
         map[x][y] = 'B';
-        return solve(wA, ++wB, ++target, ++x, ++y);
+        bool s = solve(wA, wB+1, target+1, x+1, y+1);
+
+        if (s) return true;
+
+        map[x][y] = '$'; // poison this cell
+        return false;
     } else {
         map[x][y] = 'X';
         return false;
